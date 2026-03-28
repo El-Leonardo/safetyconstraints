@@ -65,7 +65,7 @@
     "google-ai",
     "safety-constraints"
   ],
-  "author": "Safety Constraints Team",
+  "author": "Interlabs",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18.0.0"
