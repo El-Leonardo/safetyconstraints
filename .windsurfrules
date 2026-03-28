@@ -1,0 +1,18 @@
+{
+  "project": "@safetyconstraints/core",
+  "description": "Enterprise-grade AI safety constraints toolkit.",
+  "rules": [
+    "Always use strict TypeScript. No `any` types.",
+    "Ensure all public functions, classes, and interfaces have descriptive JSDoc comments.",
+    "Whenever adding or modifying functionality, include comprehensive Vitest unit tests in the `/tests` directory.",
+    "Prioritize security. When writing parsers or evaluators, consider adversarial inputs like obfuscated characters or deep nesting.",
+    "When modifying multi-provider adapters, assure consistent input/output normalization across OpenAI, Anthropic, Google, etc.",
+    "Use builder patterns for context and immutable configuration structures."
+  ],
+  "skills": {
+    "prompt_injection_analysis": "Understand and mitigate advanced prompt injection vectors.",
+    "policy_enforcement": "Apply strict rule-based output and input filtering constraints.",
+    "safety_context_building": "Construct context objects that pass safely through the SafetyEngine."
+  },
+  "branding": "Made by Interlabs"
+}

@@ -1,8 +1,20 @@
-# AI Safety Constraints Toolkit
+<div align="center">
+  <img src="https://img.shields.io/badge/Made%20by-Interlabs-blue?style=for-the-badge&logo=interlabs" alt="Made by Interlabs" />
+</div>
 
-A comprehensive, production-ready TypeScript library for AI safety guardrails. Features prompt injection detection, input/output filtering, policy enforcement, and multi-provider LLM adapters for OpenAI, Anthropic, Google, Azure, and local models.
+<br />
 
-## Features
+# 🛡️ AI Safety Constraints Toolkit
+
+A comprehensive, production-ready, enterprise-grade TypeScript library for AI safety guardrails. Features prompt injection detection, input/output filtering, policy enforcement, and multi-provider LLM adapters for OpenAI, Anthropic, Google, Azure, and local models.
+
+[![npm version](https://img.shields.io/npm/v/@safetyconstraints/core.svg?style=flat-square)](https://www.npmjs.org/package/@safetyconstraints/core)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/safetyconstraints/core/ci.yml?branch=main&style=flat-square)](https://github.com/safetyconstraints/core/actions)
+[![Coverage Status](https://img.shields.io/coveralls/github/safetyconstraints/core/main.svg?style=flat-square)](https://coveralls.io/github/safetyconstraints/core?branch=main)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
+
+## ✨ Features
 
 - **🛡️ Prompt Injection Defense**: Pattern-based detection, heuristic analysis, and semantic analysis for known attack signatures including DAN, developer mode, jailbreaks, and indirect injection
 - **🔒 Input/Output Filtering**: Content sanitization, PII detection and masking, toxic content filtering, and bias detection
@@ -426,3 +438,10 @@ Apache License 2.0 - See [LICENSE](LICENSE) for details.
 - 📖 [Documentation](https://docs.safetyconstraints.io)
 - 🐛 [Issue Tracker](https://github.com/safetyconstraints/core/issues)
 - 💬 [Discussions](https://github.com/safetyconstraints/core/discussions)
+
+---
+
+<div align="center">
+  <b>Made by Interlabs</b><br/>
+  Enterprise-Grade AI Infrastructure
+</div>
