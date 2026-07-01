@@ -5,11 +5,30 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
+  "bin": {
+    "safety-constraints": "./dist/cjs/cli/index.js",
+    "sc": "./dist/cjs/cli/index.js"
+  },
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./plugins": {
+      "import": "./dist/esm/plugins/index.js",
+      "require": "./dist/cjs/plugins/index.js",
+      "types": "./dist/types/plugins/index.d.ts"
+    },
+    "./skills": {
+      "import": "./dist/esm/skills/index.js",
+      "require": "./dist/cjs/skills/index.js",
+      "types": "./dist/types/skills/index.d.ts"
+    },
+    "./harness": {
+      "import": "./dist/esm/harness/index.js",
+      "require": "./dist/cjs/harness/index.js",
+      "types": "./dist/types/harness/index.d.ts"
     },
     "./adapters": {
       "import": "./dist/esm/adapters/index.js",

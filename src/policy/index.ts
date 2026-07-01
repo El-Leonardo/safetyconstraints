@@ -7,4 +7,6 @@ export {
   developmentPreset,
   getPreset,
   getAvailablePresets,
+  isPresetName,
+  type PresetName,
 } from './presets';

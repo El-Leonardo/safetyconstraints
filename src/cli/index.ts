@@ -8,6 +8,7 @@ import { Command } from 'commander';
 import { validateCommand } from './commands/validate';
 import { scanCommand } from './commands/scan';
 import { configCommand } from './commands/config';
+import { initCommand } from './commands/init';
 
 const program = new Command();
 
@@ -15,6 +16,16 @@ program
   .name('safety-constraints')
   .description('AI Safety Constraints Toolkit CLI')
   .version('0.1.0');
+
+// Init command — scaffold agent skills, rules, and safety config
+program
+  .command('init')
+  .description('Make this repo agent-ready: install baked-in skills, rules, and safety config')
+  .option('-d, --dir <dir>', 'Target project directory', process.cwd())
+  .option('-s, --skills <skills>', 'Comma-separated skill ids to install, or "all"', 'all')
+  .option('--force', 'Overwrite existing files', false)
+  .option('--dry-run', 'Show what would change without writing files', false)
+  .action(initCommand);
 
 // Validate command
 program
