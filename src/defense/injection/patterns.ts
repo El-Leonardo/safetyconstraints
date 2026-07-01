@@ -120,7 +120,7 @@ export const instructionOverridePatterns: InjectionPattern[] = [
   {
     id: 'forget-previous',
     name: 'Forget Previous',
-    pattern: /\b(forget\s+(everything|all|previous|above|prior)|ignore\s+(previous|above|prior))\b/is,
+    pattern: /\b(?:forget|ignore|disregard|dismiss|override)\s+(?:all\s+|any\s+|the\s+|your\s+|every\s+)*(?:previous|prior|above|earlier|preceding|everything|instructions?|rules?|guidelines?|directives?)\b/is,
     category: 'instruction_override',
     severity: 'critical',
     description: 'Attempt to make model forget instructions',
@@ -196,7 +196,7 @@ export const contextManipulationPatterns: InjectionPattern[] = [
   {
     id: 'base64-suspicious',
     name: 'Suspicious Base64',
-    pattern: /\b[a-zA-Z0-9+\/]{40,}={0,2}\b/,
+    pattern: /\b[a-zA-Z0-9+/]{40,}={0,2}\b/,
     category: 'encoding',
     severity: 'low',
     description: 'Potential base64 encoded content',

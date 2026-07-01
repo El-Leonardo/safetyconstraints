@@ -18,11 +18,20 @@ import { LocalAdapter } from './LocalAdapter';
  * Adapter factory for creating and managing provider adapters
  */
 export class AdapterFactory {
-  private adapters: Map<LLMProvider, ProviderAdapter> = new Map();
-  private config: AdapterFactoryConfig;
+  private readonly adapters: Map<LLMProvider, ProviderAdapter> = new Map();
+  private readonly config: AdapterFactoryConfig;
 
   public constructor(config: AdapterFactoryConfig) {
     this.config = config;
+
+    // Eagerly instantiate adapters so they are resolvable via getAdapter()
+    // before the asynchronous initialize() call runs.
+    for (const adapterConfig of config.adapters) {
+      const adapter = this.createAdapter(adapterConfig.provider);
+      if (adapter) {
+        this.adapters.set(adapterConfig.provider, adapter);
+      }
+    }
   }
 
   /**
@@ -30,7 +39,8 @@ export class AdapterFactory {
    */
   public async initialize(): Promise<void> {
     for (const adapterConfig of this.config.adapters) {
-      const adapter = this.createAdapter(adapterConfig.provider);
+      const adapter =
+        this.adapters.get(adapterConfig.provider) ?? this.createAdapter(adapterConfig.provider);
       if (adapter) {
         await adapter.initialize(adapterConfig);
         this.adapters.set(adapterConfig.provider, adapter);
@@ -55,7 +65,7 @@ export class AdapterFactory {
 
     // Return the first available adapter
     const firstAdapter = this.adapters.values().next().value;
-    return firstAdapter as ProviderAdapter | undefined;
+    return firstAdapter;
   }
 
   /**

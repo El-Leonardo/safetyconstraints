@@ -9,7 +9,6 @@ import type {
   SafetyResult,
   CustomRule,
   SafetyCategory,
-  SeverityLevel,
 } from '../types/safety';
 import type { LLMRequest } from '../types/providers';
 
@@ -96,7 +95,6 @@ export class PolicyEngine {
           },
           metadata: {
             ruleId: rule.id,
-            ruleName: rule.name,
           },
         });
 
@@ -222,8 +220,11 @@ export class PolicyEngine {
         return fieldValue.includes(String(condition.value));
       case 'equals':
         return fieldValue === condition.value;
-      case 'matches':
-        return new RegExp(condition.value).test(fieldValue);
+      case 'matches': {
+        const regex =
+          condition.value instanceof RegExp ? condition.value : new RegExp(String(condition.value));
+        return regex.test(fieldValue);
+      }
       case 'startsWith':
         return fieldValue.startsWith(String(condition.value));
       case 'endsWith':

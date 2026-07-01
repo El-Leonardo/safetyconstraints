@@ -181,10 +181,18 @@ export class LocalAdapter extends BaseAdapter {
       throw new Error('No response choice available');
     }
 
+    const usage: TokenUsage | undefined = openaiResponse.usage
+      ? {
+          promptTokens: openaiResponse.usage.prompt_tokens,
+          completionTokens: openaiResponse.usage.completion_tokens,
+          totalTokens: openaiResponse.usage.total_tokens,
+        }
+      : undefined;
+
     return this.buildResponse(
       choice.message.content,
       this.config.defaultModel ?? 'local-model',
-      openaiResponse.usage,
+      usage,
       choice.finish_reason,
     );
   }
@@ -279,7 +287,7 @@ export class LocalAdapter extends BaseAdapter {
       throw new Error(`Local model error: ${response.status} ${response.statusText}`);
     }
 
-    const reader = response.body?.getReader();
+    const reader = response.body?.getReader() as ReadableStreamDefaultReader<Uint8Array> | undefined;
     if (!reader) {
       throw new Error('No response body available for streaming');
     }
@@ -287,7 +295,7 @@ export class LocalAdapter extends BaseAdapter {
     const decoder = new TextDecoder();
 
     try {
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
 
@@ -377,7 +385,7 @@ export class LocalAdapter extends BaseAdapter {
       throw new Error(`Local model error: ${response.status} ${response.statusText}`);
     }
 
-    const reader = response.body?.getReader();
+    const reader = response.body?.getReader() as ReadableStreamDefaultReader<Uint8Array> | undefined;
     if (!reader) {
       throw new Error('No response body available for streaming');
     }
@@ -385,7 +393,7 @@ export class LocalAdapter extends BaseAdapter {
     const decoder = new TextDecoder();
 
     try {
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
 

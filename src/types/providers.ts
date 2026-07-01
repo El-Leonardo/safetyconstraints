@@ -191,6 +191,7 @@ export interface ProviderConfig {
   readonly customHeaders?: Record<string, string>;
   readonly defaultModel?: string;
   readonly defaultParams?: Partial<LLMRequest>;
+  readonly metadata?: Record<string, unknown>;
 }
 
 export const ProviderConfigSchema = z.object({
@@ -206,6 +207,7 @@ export const ProviderConfigSchema = z.object({
   customHeaders: z.record(z.string()).optional(),
   defaultModel: z.string().optional(),
   defaultParams: z.record(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 });
 
 /**

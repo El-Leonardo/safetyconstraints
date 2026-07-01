@@ -134,7 +134,7 @@ export class OutputFilter {
   /**
    * Filter output content
    */
-  public async filter(text: string, context: SafetyContext): Promise<SafetyResult> {
+  public async filter(text: string, _context: SafetyContext): Promise<SafetyResult> {
     const startTime = Date.now();
     const checks: SafetyCheckResult[] = [];
 

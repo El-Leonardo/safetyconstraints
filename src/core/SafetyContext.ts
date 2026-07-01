@@ -10,7 +10,7 @@ import { randomUUID } from 'crypto';
  */
 export class SafetyContextBuilder {
   private requestId: string;
-  private timestamp: Date;
+  private readonly timestamp: Date;
   private userId?: string;
   private sessionId?: string;
   private sourceIp?: string;

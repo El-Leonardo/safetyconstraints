@@ -7,7 +7,6 @@ import type {
   SafetyContext,
   SafetyCheckResult,
   SafetyResult,
-  PIIEntityType,
 } from '../../types/safety';
 import { normalizeText, detectPII, maskPII, removeInvisibleChars } from '../../utils/text';
 
@@ -65,7 +64,7 @@ export class InputSanitizer {
   /**
    * Sanitize input text and return safety result
    */
-  public async sanitize(text: string, context: SafetyContext): Promise<SafetyResult> {
+  public async sanitize(text: string, _context: SafetyContext): Promise<SafetyResult> {
     const startTime = Date.now();
     const checks: SafetyCheckResult[] = [];
 

@@ -2,24 +2,8 @@
  * Metrics collector implementation
  */
 
-import type {
-  MetricsCollector as IMetricsCollector,
-  MetricsSnapshot,
-  SafetyContext,
-  SafetyResult,
-} from '../types/monitoring';
-
-interface MetricEntry {
-  readonly timestamp: number;
-  readonly value: number;
-  readonly labels: Record<string, string>;
-}
-
-interface LatencyHistogram {
-  readonly buckets: number[];
-  readonly sum: number;
-  readonly count: number;
-}
+import type { MetricsCollector as IMetricsCollector, MetricsSnapshot } from '../types/monitoring';
+import type { SafetyContext, SafetyResult } from '../types/safety';
 
 /**
  * Metrics collector for safety operations
@@ -30,15 +14,15 @@ export class MetricsCollectorImpl implements IMetricsCollector {
   private requestCount = 0;
   private blockedCount = 0;
   private sanitizedCount = 0;
-  private violationsByCategory: Map<string, number> = new Map();
+  private readonly violationsByCategory: Map<string, number> = new Map();
   private latencies: number[] = [];
-  private maxLatencyBuffer = 10000;
+  private readonly maxLatencyBuffer = 10000;
   private startTime = Date.now();
 
   /**
    * Record a request
    */
-  public recordRequest(context: SafetyContext, result: SafetyResult): void {
+  public recordRequest(_context: SafetyContext, result: SafetyResult): void {
     this.requestCount++;
 
     if (!result.isSafe) {
@@ -53,7 +37,7 @@ export class MetricsCollectorImpl implements IMetricsCollector {
   /**
    * Record a violation
    */
-  public recordViolation(context: SafetyContext, result: SafetyResult): void {
+  public recordViolation(_context: SafetyContext, result: SafetyResult): void {
     for (const check of result.checks) {
       if (!check.passed) {
         const current = this.violationsByCategory.get(check.category) ?? 0;
@@ -65,7 +49,7 @@ export class MetricsCollectorImpl implements IMetricsCollector {
   /**
    * Record latency
    */
-  public recordLatency(context: SafetyContext, latencyMs: number): void {
+  public recordLatency(_context: SafetyContext, latencyMs: number): void {
     this.latencies.push(latencyMs);
 
     // Keep buffer size manageable

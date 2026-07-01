@@ -65,7 +65,6 @@ export abstract class BaseAdapter implements ProviderAdapter {
       throw new Error(`Adapter ${this.name} is not initialized`);
     }
 
-    const startTime = Date.now();
     let attempts = 0;
     let lastError: Error | undefined;
 

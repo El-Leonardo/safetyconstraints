@@ -2,7 +2,7 @@
  * Text processing utilities
  */
 
-import type { PIIEntityType, PIIConfig, CustomPIIPattern } from '../types/safety';
+import type { PIIEntityType, SeverityLevel } from '../types/safety';
 
 export interface PIIDetectionResult {
   readonly found: boolean;
@@ -19,6 +19,7 @@ export interface ObfuscationResult {
   readonly techniques: string[];
   readonly confidence: number;
   readonly entropy: number;
+  readonly severity: SeverityLevel;
 }
 
 /**
@@ -38,10 +39,8 @@ export function normalizeText(text: string): string {
  * Remove invisible/hidden characters
  */
 export function removeInvisibleChars(text: string): string {
-  // Remove zero-width characters
-  return text
-    .replace(/[\u200B-\u200D\uFEFF\u2060-\u206F]/g, '')
-    .replace(/[\u180E\u200B\u200C\u200D\uFEFF]/g, '');
+  // Remove zero-width and other invisible formatting characters
+  return text.replace(/[\u180E\u200B-\u200D\u2060-\u206F\uFEFF]/g, '');
 }
 
 /**
@@ -63,7 +62,7 @@ export function detectPII(
     password: /\b(?:password|pwd|pass)\s*[=:]\s*\S+/gi,
     name: /\b(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b/g,
     address: /\b\d+\s+[A-Za-z]+(?:\s+[A-Za-z]+)*,\s*[A-Za-z]+,\s*[A-Z]{2}\s*\d{5}\b/g,
-    date_of_birth: /\b\d{1,2}[\/\.-]\d{1,2}[\/\.-]\d{2,4}\b/g,
+    date_of_birth: /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/g,
     url: /\bhttps?:\/\/[^\s]+/g,
     custom: /./g, // Placeholder
   };
@@ -151,9 +150,10 @@ export function detectObfuscation(text: string): ObfuscationResult {
   const techniques: string[] = [];
   let confidence = 0;
 
-  // Check for zero-width characters
+  // Check for zero-width characters. Any occurrence is suspicious in prompt text,
+  // so a single one is enough to flag obfuscation.
   const zeroWidthCount = (text.match(/[\u200B-\u200D\uFEFF\u2060-\u206F]/g) ?? []).length;
-  if (zeroWidthCount > 3) {
+  if (zeroWidthCount >= 1) {
     techniques.push('zero_width_characters');
     confidence += Math.min(zeroWidthCount * 0.05, 0.3);
   }
@@ -181,7 +181,7 @@ export function detectObfuscation(text: string): ObfuscationResult {
   }
 
   // Check for base64-like strings
-  const base64Strings = (text.match(/\b[A-Za-z0-9+\/]{40,}={0,2}\b/g) ?? []).length;
+  const base64Strings = (text.match(/\b[A-Za-z0-9+/]{40,}={0,2}\b/g) ?? []).length;
   if (base64Strings > 0) {
     techniques.push('base64_encoding');
     confidence += Math.min(base64Strings * 0.1, 0.2);
@@ -194,11 +194,16 @@ export function detectObfuscation(text: string): ObfuscationResult {
     confidence += 0.1;
   }
 
+  const cappedConfidence = Math.min(confidence, 0.95);
+  const severity: SeverityLevel =
+    cappedConfidence >= 0.7 ? 'high' : cappedConfidence >= 0.4 ? 'medium' : 'low';
+
   return {
     hasObfuscation: techniques.length > 0,
     techniques,
-    confidence: Math.min(confidence, 0.95),
+    confidence: cappedConfidence,
     entropy,
+    severity,
   };
 }
 
