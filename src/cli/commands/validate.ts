@@ -83,7 +83,7 @@ async function loadConfig(options: ValidateOptions): Promise<SafetyConfig> {
   return config;
 }
 
-function printResults(result: ReturnType<SafetyEngine['validateInput']> extends Promise<infer T> ? T : never, text: string): void {
+function printResults(result: ReturnType<SafetyEngine['validateInput']> extends Promise<infer T> ? T : never, _text: string): void {
   console.log('\n=== Safety Validation Results ===\n');
   console.log(`Safe: ${result.isSafe ? '✓ YES' : '✗ NO'}`);
   console.log(`Score: ${result.score.toFixed(1)}/100`);

@@ -11,7 +11,6 @@ import type {
   ChatMessage,
   TokenUsage,
   FunctionDefinition,
-  ToolDefinition,
 } from '../types/providers';
 import type { SafetyContext } from '../types/safety';
 
@@ -85,7 +84,7 @@ interface OpenAIStreamChunk {
  */
 export class OpenAIAdapter extends BaseAdapter {
   public readonly provider: LLMProvider = 'openai';
-  public readonly name = 'OpenAI';
+  public readonly name: string = 'OpenAI';
 
   private apiKey?: string;
   private baseUrl = 'https://api.openai.com/v1';
@@ -205,7 +204,7 @@ export class OpenAIAdapter extends BaseAdapter {
       throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
     }
 
-    const reader = response.body?.getReader();
+    const reader = response.body?.getReader() as ReadableStreamDefaultReader<Uint8Array> | undefined;
     if (!reader) {
       throw new Error('No response body available for streaming');
     }
@@ -214,7 +213,7 @@ export class OpenAIAdapter extends BaseAdapter {
     let buffer = '';
 
     try {
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
 
@@ -290,7 +289,7 @@ export class OpenAIAdapter extends BaseAdapter {
     return openaiRequest;
   }
 
-  private buildHeaders(): Record<string, string> {
+  protected buildHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -310,7 +309,7 @@ export class OpenAIAdapter extends BaseAdapter {
     return headers;
   }
 
-  private async makeRequest(
+  protected async makeRequest(
     method: string,
     path: string,
     body?: unknown,

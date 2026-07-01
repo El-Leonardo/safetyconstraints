@@ -181,7 +181,7 @@ export class GoogleAdapter extends BaseAdapter {
       throw new Error(`Google AI API error: ${response.status} ${response.statusText}`);
     }
 
-    const reader = response.body?.getReader();
+    const reader = response.body?.getReader() as ReadableStreamDefaultReader<Uint8Array> | undefined;
     if (!reader) {
       throw new Error('No response body available for streaming');
     }
@@ -190,7 +190,7 @@ export class GoogleAdapter extends BaseAdapter {
     let buffer = '';
 
     try {
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
 

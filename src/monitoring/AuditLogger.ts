@@ -2,14 +2,8 @@
  * Audit logger implementation
  */
 
-import type {
-  AuditLogger as IAuditLogger,
-  AuditEntry,
-  AuditQueryFilters,
-  AuditConfig,
-  SafetyResult,
-  SafetyContext,
-} from '../types/safety';
+import type { AuditEntry, AuditConfig, SafetyResult, SafetyContext } from '../types/safety';
+import type { AuditLogger as IAuditLogger, AuditQueryFilters } from '../types/monitoring';
 import { randomUUID } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -18,7 +12,7 @@ import * as path from 'path';
  * Audit logger with multiple output destinations
  */
 export class AuditLoggerImpl implements IAuditLogger {
-  private config: AuditConfig;
+  private readonly config: AuditConfig;
   private buffer: AuditEntry[] = [];
   private flushInterval?: NodeJS.Timeout;
   private initialized = false;
@@ -50,7 +44,9 @@ export class AuditLoggerImpl implements IAuditLogger {
       }
 
       // Setup buffer flush interval for batch logging
-      this.flushInterval = setInterval(() => this.flush(), 5000);
+      this.flushInterval = setInterval(() => {
+        void this.flush();
+      }, 5000);
     }
 
     this.initialized = true;
@@ -294,10 +290,10 @@ export class AuditLoggerImpl implements IAuditLogger {
 
     switch (entry.level) {
       case 'error':
-        console.error(prefix, entry.message, entry.details);
+        console.error(prefix, entry.message, entry.metadata);
         break;
       case 'warn':
-        console.warn(prefix, entry.message, entry.details);
+        console.warn(prefix, entry.message, entry.metadata);
         break;
       case 'debug':
         console.debug(prefix, entry.message);

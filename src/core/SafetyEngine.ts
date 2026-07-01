@@ -201,7 +201,7 @@ export class SafetyEngine {
 
       const score = this.calculateSafetyScore(checks);
       const isSafe = score >= this.getMinimumSafeScore();
-      const action = isSafe ? 'allow' : 'block';
+      const action: SafetyAction = isSafe ? 'allow' : this.determineAction(checks);
 
       let sanitizedResponse: LLMResponse | undefined;
       if (action === 'sanitize' || action === 'rewrite') {
@@ -348,7 +348,7 @@ export class SafetyEngine {
   /**
    * Determine the action to take based on failed checks
    */
-  private determineAction(checks: SafetyCheckResult[]): SafetyAction {
+  private determineAction(checks: readonly SafetyCheckResult[]): SafetyAction {
     const failedChecks = checks.filter((c) => !c.passed);
 
     if (failedChecks.length === 0) {
@@ -415,6 +415,20 @@ export class SafetyEngine {
       this.metricsCollector.recordViolation(context, result);
     }
     this.metricsCollector.recordLatency(context, result.processingTimeMs);
+
+    // Trigger alerts for violations if an alert manager is configured
+    if (this.alertManager && !result.isSafe) {
+      const failedCheck = result.checks.find((c) => !c.passed);
+      await this.alertManager.trigger({
+        id: randomUUID(),
+        timestamp: new Date(),
+        severity: failedCheck?.severity ?? 'medium',
+        title: 'Safety violation detected',
+        message: failedCheck?.message ?? 'A safety violation was detected',
+        context,
+        safetyResult: result,
+      });
+    }
 
     // Log audit entry if enabled
     if (this.config.auditConfig?.enabled) {

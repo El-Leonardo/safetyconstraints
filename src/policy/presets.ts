@@ -12,7 +12,13 @@ export const permissivePreset: SafetyConfig = {
   enabled: true,
   mode: 'bidirectional',
   strictness: 'permissive',
-  categories: ['prompt_injection', 'harmful_instructions', 'data_exfiltration'],
+  categories: [
+    'prompt_injection',
+    'instruction_override',
+    'indirect_injection',
+    'harmful_instructions',
+    'data_exfiltration',
+  ],
   piiConfig: {
     enabled: true,
     entities: ['ssn', 'credit_card', 'api_key', 'password'],
@@ -49,6 +55,8 @@ export const moderatePreset: SafetyConfig = {
     'harmful_instructions',
     'data_exfiltration',
     'encoding_obfuscation',
+    'instruction_override',
+    'indirect_injection',
   ],
   piiConfig: {
     enabled: true,

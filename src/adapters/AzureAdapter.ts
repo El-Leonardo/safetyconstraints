@@ -3,7 +3,7 @@
  */
 
 import { OpenAIAdapter } from './OpenAIAdapter';
-import type { LLMProvider, ProviderConfig } from '../types/providers';
+import type { LLMProvider } from '../types/providers';
 
 /**
  * Azure OpenAI adapter - extends OpenAI adapter with Azure-specific configuration

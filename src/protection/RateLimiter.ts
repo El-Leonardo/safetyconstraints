@@ -22,8 +22,8 @@ export interface RateLimiterOptions {
  * Token bucket rate limiter with sliding window
  */
 export class RateLimiter {
-  private config: RateLimitConfig;
-  private storage: Map<string, RateLimitEntry> = new Map();
+  private readonly config: RateLimitConfig;
+  private readonly storage: Map<string, RateLimitEntry> = new Map();
   private cleanupInterval?: NodeJS.Timeout;
   private initialized = false;
 

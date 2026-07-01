@@ -8,6 +8,7 @@ import type {
   SafetyCheckResult,
   SafetyResult,
   SeverityLevel,
+  SafetyCategory,
 } from '../../types/safety';
 import { getAllPatterns, type InjectionPattern } from './patterns';
 import { normalizeText, detectObfuscation } from '../../utils/text';
@@ -20,11 +21,17 @@ export interface InjectionDetectionOptions {
   readonly maxRecursionDepth: number;
 }
 
-interface DetectionMatch {
-  readonly pattern: InjectionPattern;
-  readonly matches: RegExpMatchArray[];
-  readonly confidence: number;
-}
+/**
+ * Human-readable labels for obfuscation technique keys.
+ */
+const OBFUSCATION_TECHNIQUE_LABELS: Record<string, string> = {
+  zero_width_characters: 'zero-width characters',
+  percent_encoding: 'percent-encoding',
+  mixed_scripts: 'mixed scripts',
+  unusual_spacing: 'unusual spacing',
+  base64_encoding: 'base64 encoding',
+  high_entropy: 'high entropy',
+};
 
 /**
  * Prompt injection detector
@@ -70,7 +77,7 @@ export class InjectionDetector {
   /**
    * Detect prompt injection attempts in text
    */
-  public async detect(text: string, context: SafetyContext): Promise<SafetyResult> {
+  public async detect(text: string, _context: SafetyContext): Promise<SafetyResult> {
     const startTime = Date.now();
     const checks: SafetyCheckResult[] = [];
 
@@ -176,7 +183,9 @@ export class InjectionDetector {
         category: 'prompt_injection',
         severity: obfuscationResult.severity,
         confidence: obfuscationResult.confidence,
-        message: `Text obfuscation detected: ${obfuscationResult.techniques.join(', ')}`,
+        message: `Text obfuscation detected: ${obfuscationResult.techniques
+          .map((t) => OBFUSCATION_TECHNIQUE_LABELS[t] ?? t)
+          .join(', ')}`,
         details: {
           techniques: obfuscationResult.techniques,
           entropy: obfuscationResult.entropy,
@@ -242,7 +251,7 @@ export class InjectionDetector {
   /**
    * Semantic analysis (placeholder for embedding-based detection)
    */
-  private async detectSemantic(text: string): Promise<SafetyCheckResult[]> {
+  private async detectSemantic(_text: string): Promise<SafetyCheckResult[]> {
     // This would require an embedding model
     // For now, return empty array
     return [];
@@ -398,8 +407,8 @@ export class InjectionDetector {
   /**
    * Map pattern category to safety category
    */
-  private mapPatternCategory(patternCategory: string): string {
-    const mapping: Record<string, string> = {
+  private mapPatternCategory(patternCategory: string): SafetyCategory {
+    const mapping: Record<string, SafetyCategory> = {
       jailbreak: 'jailbreak',
       instruction_override: 'instruction_override',
       context_manipulation: 'prompt_injection',

@@ -16,6 +16,9 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'warn',
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    // Many public methods implement async interfaces (returning Promise) but are
+    // currently synchronous stubs; requiring an await in every one is noise.
+    '@typescript-eslint/require-await': 'off',
     '@typescript-eslint/prefer-readonly': 'error',
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/prefer-optional-chain': 'error',

@@ -77,7 +77,7 @@ export class AnthropicAdapter extends BaseAdapter {
 
   private apiKey?: string;
   private baseUrl = 'https://api.anthropic.com/v1';
-  private apiVersion = '2023-06-01';
+  private readonly apiVersion = '2023-06-01';
 
   protected onInitialize(): void {
     this.apiKey = this.config.apiKey;
@@ -173,17 +173,16 @@ export class AnthropicAdapter extends BaseAdapter {
       throw new Error(`Anthropic API error: ${response.status} ${response.statusText}`);
     }
 
-    const reader = response.body?.getReader();
+    const reader = response.body?.getReader() as ReadableStreamDefaultReader<Uint8Array> | undefined;
     if (!reader) {
       throw new Error('No response body available for streaming');
     }
 
     const decoder = new TextDecoder();
     let buffer = '';
-    let accumulatedText = '';
 
     try {
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
 
@@ -201,7 +200,6 @@ export class AnthropicAdapter extends BaseAdapter {
             switch (event.type) {
               case 'content_block_delta':
                 if (event.delta?.text) {
-                  accumulatedText += event.delta.text;
                   const chunk = this.buildChunk(event.delta.text, false);
                   await callback(chunk);
                 }
