@@ -21,6 +21,7 @@ import { PolicyEngine } from '../policy/PolicyEngine';
 import { RateLimiter } from '../protection/RateLimiter';
 import { AuditLoggerImpl } from '../monitoring/AuditLogger';
 import { MetricsCollectorImpl } from '../monitoring/MetricsCollector';
+import { PluginRegistry } from '../plugins/PluginRegistry';
 
 export interface SafetyEngineDependencies {
   injectionDetector?: InjectionDetector;
@@ -31,6 +32,8 @@ export interface SafetyEngineDependencies {
   auditLogger?: AuditLogger;
   metricsCollector?: MetricsCollector;
   alertManager?: AlertManager;
+  /** Registry of runtime safety plugins. Defaults to an empty registry. */
+  pluginRegistry?: PluginRegistry;
 }
 
 /**
@@ -46,6 +49,7 @@ export class SafetyEngine {
   private readonly auditLogger: AuditLogger;
   private readonly metricsCollector: MetricsCollector;
   private readonly alertManager?: AlertManager;
+  private readonly pluginRegistry: PluginRegistry;
   private initialized = false;
 
   public constructor(config: SafetyConfig, dependencies: SafetyEngineDependencies = {}) {
@@ -58,6 +62,14 @@ export class SafetyEngine {
     this.auditLogger = dependencies.auditLogger ?? new AuditLoggerImpl(config.auditConfig);
     this.metricsCollector = dependencies.metricsCollector ?? new MetricsCollectorImpl();
     this.alertManager = dependencies.alertManager;
+    this.pluginRegistry = dependencies.pluginRegistry ?? new PluginRegistry();
+  }
+
+  /**
+   * Access the plugin registry backing this engine.
+   */
+  public getPluginRegistry(): PluginRegistry {
+    return this.pluginRegistry;
   }
 
   /**
@@ -74,6 +86,7 @@ export class SafetyEngine {
       this.outputFilter.initialize(),
       this.policyEngine.initialize(),
       this.rateLimiter.initialize(),
+      this.pluginRegistry.initialize(),
     ]);
 
     this.initialized = true;
@@ -138,6 +151,10 @@ export class SafetyEngine {
         return this.buildSafetyResult(false, policyResult.score, checks, startTime, action);
       }
 
+      // Run registered runtime plugins over the input text
+      const pluginChecks = await this.pluginRegistry.run('input', textContent, context);
+      checks.push(...pluginChecks);
+
       // Calculate overall score
       const score = this.calculateSafetyScore(checks);
       const isSafe = score >= this.getMinimumSafeScore();
@@ -198,6 +215,10 @@ export class SafetyEngine {
           return result;
         }
       }
+
+      // Run registered runtime plugins over the output text
+      const pluginChecks = await this.pluginRegistry.run('output', response.content, context);
+      checks.push(...pluginChecks);
 
       const score = this.calculateSafetyScore(checks);
       const isSafe = score >= this.getMinimumSafeScore();

@@ -53,7 +53,37 @@ export {
   developmentPreset,
   getPreset,
   getAvailablePresets,
+  isPresetName,
+  type PresetName,
 } from './policy';
+
+// Plugin system
+export {
+  PluginRegistry,
+  createPluginRegistry,
+  builtinPlugins,
+  secretScannerPlugin,
+  piiGuardPlugin,
+  injectionGuardPlugin,
+  dangerousCommandGuardPlugin,
+} from './plugins';
+
+// Skill system
+export {
+  SkillRegistry,
+  createSkillRegistry,
+  installSkills,
+  type InstallOptions,
+  builtinSkills,
+  safeCodingSkill,
+} from './skills';
+
+// Agent harness
+export {
+  SafetyGuard,
+  SafetyViolationError,
+  type SafetyGuardOptions,
+} from './harness';
 
 // Provider adapters
 export {

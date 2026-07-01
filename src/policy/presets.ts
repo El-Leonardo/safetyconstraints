@@ -194,23 +194,37 @@ export const developmentPreset: SafetyConfig = {
 };
 
 /**
- * Get preset by name
+ * Names of the built-in configuration presets.
  */
-export function getPreset(name: string): SafetyConfig | undefined {
-  const presets: Record<string, SafetyConfig> = {
-    permissive: permissivePreset,
-    moderate: moderatePreset,
-    strict: strictPreset,
-    maximum: maximumPreset,
-    development: developmentPreset,
-  };
+export type PresetName = 'permissive' | 'moderate' | 'strict' | 'maximum' | 'development';
 
-  return presets[name];
+const PRESETS: Record<PresetName, SafetyConfig> = {
+  permissive: permissivePreset,
+  moderate: moderatePreset,
+  strict: strictPreset,
+  maximum: maximumPreset,
+  development: developmentPreset,
+};
+
+/**
+ * Type guard for a valid {@link PresetName}.
+ */
+export function isPresetName(name: string): name is PresetName {
+  return name in PRESETS;
 }
 
 /**
- * Get all available preset names
+ * Get preset by name.
+ * @param name a preset name.
+ * @returns the matching config, or `undefined` if the name is unknown.
  */
-export function getAvailablePresets(): string[] {
-  return ['permissive', 'moderate', 'strict', 'maximum', 'development'];
+export function getPreset(name: string): SafetyConfig | undefined {
+  return isPresetName(name) ? PRESETS[name] : undefined;
+}
+
+/**
+ * Get all available preset names.
+ */
+export function getAvailablePresets(): PresetName[] {
+  return Object.keys(PRESETS) as PresetName[];
 }
